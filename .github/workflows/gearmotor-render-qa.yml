@@ -35,3 +35,4 @@ jobs:
           name: cbl-gearmotor-render-qa
           path: /tmp/cbl-gearmotor-renders/*.png
           retention-days: 3
+          if-no-files-found: error
