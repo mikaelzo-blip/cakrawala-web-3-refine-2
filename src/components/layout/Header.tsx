@@ -7,7 +7,6 @@ import Image from 'next/image';
 import { companyInfo, mainNavItems } from '@/data/company';
 import { resolveSectionHref, cn } from '@/lib/utils';
 import { Container } from '@/components/ui/Container';
-import { Button } from '@/components/ui/Button';
 import { DynamicIcon } from '@/components/ui/DynamicIcon';
 import { MobileMenu } from './MobileMenu';
 
@@ -25,8 +24,7 @@ export function Header() {
       if (pathname !== '/') return;
 
       const sections = ['layanan', 'keahlian', 'cara-kerja', 'mengapa-cbl', 'kontak'];
-      
-      // If near top of page, active section is home '/'
+
       if (window.scrollY < 200) {
         setActiveSection('/');
         return;
@@ -56,12 +54,8 @@ export function Header() {
 
   const checkIsActive = (itemHref: string) => {
     if (pathname === '/') {
-      if (itemHref === '/') {
-        return activeSection === '/';
-      }
-      if (itemHref.startsWith('#')) {
-        return activeSection === itemHref;
-      }
+      if (itemHref === '/') return activeSection === '/';
+      if (itemHref.startsWith('#')) return activeSection === itemHref;
       return pathname === itemHref;
     }
     return pathname === itemHref;
@@ -77,10 +71,7 @@ export function Header() {
         const elementPosition = targetEl.getBoundingClientRect().top;
         const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
-        window.scrollTo({
-          top: offsetPosition,
-          behavior: 'smooth',
-        });
+        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
         window.history.pushState(null, '', `/#${sectionId}`);
         setActiveSection(itemHref);
       }
@@ -92,43 +83,43 @@ export function Header() {
     }
   };
 
+  const whatsappHref = `https://wa.me/${companyInfo.whatsappNumber}?text=${encodeURIComponent(
+    'Halo CBL, saya ingin konsultasi kebutuhan teknik fasilitas kami.'
+  )}`;
+
   return (
     <>
       <header
         className={cn(
-          'sticky top-0 z-40 w-full transition-all duration-200 bg-white/95 backdrop-blur-md border-b',
-          isScrolled ? 'border-[#E2E8F0] shadow-sm py-3' : 'border-transparent py-4'
+          'sticky top-0 z-40 w-full border-b bg-[#F4F1EA]/95 backdrop-blur-sm transition-colors duration-200',
+          isScrolled ? 'border-[#102A43]/20' : 'border-[#102A43]/10'
         )}
       >
-        <Container className="flex items-center justify-between">
-          {/* Logo Perusahaan */}
+        <Container className="flex h-20 items-center justify-between gap-6">
           <Link
             href="/"
             onClick={(e) => handleNavClick(e, '/')}
-            className="flex items-center gap-3 group focus-visible:outline-2 focus-visible:outline-[#0E6BA8] rounded-lg"
+            className="group flex min-w-0 items-center gap-3 focus-visible:outline-2 focus-visible:outline-[#8C3B16] focus-visible:outline-offset-4"
           >
-            <div className="relative w-10 h-10 shrink-0 group-hover:scale-105 transition-transform">
-              <Image
-                src="/logo/cbl-logo.png"
-                alt="Logo CV Cakrawala Buana Lestari"
-                width={40}
-                height={40}
-                className="w-full h-full object-contain"
-                priority
-              />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-extrabold text-[#0F2942] tracking-tight text-base sm:text-lg leading-none">
-                {companyInfo.legalName}
+            <Image
+              src="/logo/cbl-logo.png"
+              alt="Logo CV Cakrawala Buana Lestari"
+              width={38}
+              height={38}
+              className="h-[38px] w-[38px] shrink-0 object-contain"
+              priority
+            />
+            <div className="min-w-0">
+              <span className="block truncate text-sm font-semibold tracking-[-0.015em] text-[#102A43] sm:text-[0.95rem]">
+                CV Cakrawala Buana Lestari
               </span>
-              <span className="text-xs text-[#475569] font-medium tracking-wide mt-1">
-                Jasa Teknik &amp; Otomasi Terpadu
+              <span className="mt-0.5 hidden text-[0.62rem] font-medium uppercase tracking-[0.13em] text-[#657482] sm:block">
+                Engineering · Technical Services
               </span>
             </div>
           </Link>
 
-          {/* Navigasi Desktop */}
-          <nav className="hidden lg:flex items-center gap-1" aria-label="Navigasi Utama">
+          <nav className="hidden items-center gap-5 xl:flex" aria-label="Navigasi Utama">
             {mainNavItems.map((item) => {
               const href = resolveSectionHref(item.href, pathname);
               const isActive = checkIsActive(item.href);
@@ -139,10 +130,10 @@ export function Header() {
                   href={href}
                   onClick={(e) => handleNavClick(e, item.href)}
                   className={cn(
-                    'px-3.5 py-2 text-sm font-medium rounded-lg transition-all duration-150',
+                    'border-b py-1 text-[0.72rem] font-semibold tracking-[0.04em] transition-colors',
                     isActive
-                      ? 'text-[#0E6BA8] bg-[#F0F7FD] font-bold shadow-2xs'
-                      : 'text-[#0F172A] hover:text-[#0E6BA8] hover:bg-[#F8FAFC]'
+                      ? 'border-[#8C3B16] text-[#8C3B16]'
+                      : 'border-transparent text-[#536474] hover:border-[#102A43]/35 hover:text-[#102A43]'
                   )}
                 >
                   {item.label}
@@ -151,26 +142,24 @@ export function Header() {
             })}
           </nav>
 
-          {/* Action CTA Desktop */}
-          <div className="hidden lg:flex items-center gap-3">
-            <Button
-              href={`https://wa.me/${companyInfo.whatsappNumber}?text=${encodeURIComponent(
-                'Halo CBL, saya ingin konsultasi kebutuhan teknik fasilitas kami.'
-              )}`}
-              external
-              variant="whatsapp"
-              size="sm"
+          <div className="hidden shrink-0 xl:block">
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 border-b border-[#8C3B16] pb-1 text-sm font-semibold text-[#8C3B16] transition-colors hover:text-[#6F2E12]"
             >
-              <DynamicIcon name="MessageSquare" size={16} />
-              <span>{companyInfo.whatsappFormatted}</span>
-            </Button>
+              Project inquiry
+              <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
+                ↗
+              </span>
+            </a>
           </div>
 
-          {/* Tombol Hamburger Mobile */}
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(true)}
-            className="lg:hidden p-2 text-[#0F2942] hover:bg-[#F8FAFC] rounded-lg focus-visible:outline-[#0E6BA8]"
+            className="p-2 text-[#102A43] transition-colors hover:text-[#8C3B16] focus-visible:outline-2 focus-visible:outline-[#8C3B16] xl:hidden"
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-navigation"
             aria-label="Buka menu navigasi"
@@ -180,7 +169,6 @@ export function Header() {
         </Container>
       </header>
 
-      {/* Menu Mobile */}
       <MobileMenu
         isOpen={isMobileMenuOpen}
         onClose={closeMobileMenu}
