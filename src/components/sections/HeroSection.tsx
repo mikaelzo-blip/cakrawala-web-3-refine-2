@@ -1,89 +1,81 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
-import { Button } from '@/components/ui/Button';
-import { DynamicIcon } from '@/components/ui/DynamicIcon';
 import { companyInfo } from '@/data/company';
 
-const capabilityTags = ['Kelistrikan', 'Otomasi', 'Mekanikal', 'HVAC', 'Pompa', 'Pencahayaan'];
-
 export function HeroSection() {
+  const whatsappHref = `https://wa.me/${companyInfo.whatsappNumber}?text=${encodeURIComponent(
+    'Halo CBL, saya ingin mendiskusikan kebutuhan teknis fasilitas kami.'
+  )}`;
+
   return (
-    <section className="relative overflow-hidden bg-[#F7FAFC] border-b border-[#E2E8F0]">
-      <div className="absolute inset-0 engineering-grid opacity-55" aria-hidden="true" />
-      <div className="absolute -left-24 top-20 h-72 w-72 rounded-full bg-[#0E6BA8]/8 blur-3xl" aria-hidden="true" />
-      <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-[#C2410C]/7 blur-3xl" aria-hidden="true" />
-
-      <Container className="relative z-10 grid min-h-[720px] grid-cols-1 items-center gap-10 py-14 md:py-20 lg:grid-cols-12 lg:gap-14 lg:py-24">
-        <div className="hero-enter lg:col-span-7">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#0E6BA8]/25 bg-white px-3.5 py-2 text-xs font-bold text-[#0E6BA8] shadow-sm">
-            <span className="h-2 w-2 rounded-full bg-[#C2410C]" />
-            Pengalaman proyek terdokumentasi • 2022–2026
+    <section className="border-b border-[#D9E1E8] bg-[#F4F1EA] text-[#102A43]">
+      <Container className="pt-16 sm:pt-20 lg:pt-24">
+        <div className="grid grid-cols-1 gap-10 border-t border-[#102A43]/20 pt-5 lg:grid-cols-12 lg:gap-8">
+          <div className="lg:col-span-3">
+            <p className="max-w-[16rem] text-[0.72rem] font-semibold uppercase leading-5 tracking-[0.18em] text-[#8C3B16]">
+              CV Cakrawala Buana Lestari
+            </p>
+            <p className="mt-3 max-w-[15rem] text-sm leading-6 text-[#536474]">
+              Engineering, construction & technical services
+              <br />
+              Jakarta, Indonesia
+            </p>
           </div>
 
-          <h1 className="mt-7 max-w-4xl text-4xl font-black leading-[1.05] tracking-[-0.035em] text-[#0F2942] sm:text-5xl md:text-6xl lg:text-[4.25rem]">
-            Kebutuhan teknis fasilitas ditangani dari pemeriksaan awal hingga serah terima.
-          </h1>
-
-          <p className="mt-6 max-w-2xl text-base font-medium leading-relaxed text-[#475569] sm:text-lg">
-            CBL membantu pengelola fasilitas merencanakan dan melaksanakan pekerjaan kelistrikan, otomasi, mekanikal, HVAC, sistem pompa, serta pencahayaan sesuai kebutuhan setiap proyek.
-          </p>
-
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button
-              href={`https://wa.me/${companyInfo.whatsappNumber}?text=${encodeURIComponent('Halo CBL, saya ingin mendiskusikan kebutuhan teknis fasilitas kami.')}`}
-              external
-              variant="whatsapp"
-              size="lg"
-              className="w-full sm:w-auto"
-            >
-              <DynamicIcon name="MessageSquareText" size={20} />
-              Konsultasikan kebutuhan Anda
-            </Button>
-            <Button href="/proyek" variant="outline" size="lg" className="w-full bg-white sm:w-auto">
-              Lihat portofolio pekerjaan
-              <DynamicIcon name="ArrowRight" size={19} />
-            </Button>
-          </div>
-
-          <div className="mt-9 flex flex-wrap gap-2" aria-label="Cakupan layanan">
-            {capabilityTags.map((tag) => (
-              <span key={tag} className="rounded-lg border border-[#D9E5EF] bg-white/80 px-3 py-1.5 text-xs font-semibold text-[#475569]">
-                {tag}
-              </span>
-            ))}
+          <div className="lg:col-span-9">
+            <h1 className="max-w-[68rem] text-[clamp(3.2rem,7.2vw,7.6rem)] font-semibold leading-[0.9] tracking-[-0.055em] text-[#102A43]">
+              Pekerjaan teknis yang direncanakan dengan jelas dan diselesaikan di lapangan.
+            </h1>
           </div>
         </div>
 
-        <div className="hero-enter hero-enter-delayed relative lg:col-span-5">
-          <div className="relative mx-auto aspect-[4/5] max-h-[610px] max-w-[520px] overflow-hidden rounded-[2rem] border border-white/80 bg-[#D9E5EF] shadow-[0_32px_90px_-32px_rgba(15,41,66,0.5)]">
-            <Image
-              src="/images/hero-conveyor-maintenance.jpg"
-              alt="Dokumentasi pekerjaan teknis pada sistem conveyor"
-              fill
-              priority
-              sizes="(max-width: 1024px) 90vw, 42vw"
-              className="object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0F2942]/80 via-[#0F2942]/10 to-transparent" />
-            <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
-              <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-white/15 text-white backdrop-blur-md">
-                <DynamicIcon name="ShieldCheck" size={22} />
-              </div>
-              <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#67E8F9]">Berdasarkan dokumentasi pekerjaan</p>
-              <p className="mt-2 text-xl font-bold leading-snug text-white sm:text-2xl">
-                Setiap studi kasus menjelaskan kebutuhan, tahapan pekerjaan, dan hasil tanpa mengungkap data transaksi yang bersifat sensitif.
-              </p>
-            </div>
+        <div className="mt-10 grid grid-cols-1 gap-8 pb-12 lg:mt-14 lg:grid-cols-12 lg:items-end lg:pb-16">
+          <div className="lg:col-start-4 lg:col-span-5">
+            <p className="max-w-xl text-base leading-7 text-[#536474] sm:text-lg sm:leading-8">
+              CBL menangani kebutuhan kelistrikan, otomasi, mekanikal, HVAC, sistem pompa, dan pencahayaan melalui pekerjaan yang terdokumentasi dari pemeriksaan awal hingga serah terima.
+            </p>
           </div>
 
-          <div className="absolute -left-3 top-10 hidden rounded-2xl border border-white/70 bg-white/95 p-4 shadow-xl backdrop-blur-md sm:block lg:-left-10">
-            <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F0F7FD] text-[#0E6BA8]"><DynamicIcon name="ClipboardCheck" size={20} /></div>
-              <div><p className="text-xs text-[#475569]">Pendekatan kerja</p><p className="text-sm font-bold text-[#0F2942]">Survei • Perencanaan • Pelaksanaan</p></div>
-            </div>
+          <div className="flex flex-wrap items-center gap-x-7 gap-y-4 lg:col-span-4 lg:justify-end">
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-3 border-b border-[#8C3B16] pb-1 text-sm font-semibold text-[#8C3B16] transition-colors hover:text-[#6F2E12]"
+            >
+              Diskusikan proyek
+              <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">↗</span>
+            </a>
+            <Link
+              href="/proyek"
+              className="group inline-flex items-center gap-3 border-b border-[#102A43]/45 pb-1 text-sm font-semibold text-[#102A43] transition-colors hover:border-[#102A43]"
+            >
+              Lihat pekerjaan
+              <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">→</span>
+            </Link>
           </div>
         </div>
       </Container>
+
+      <div className="relative h-[56vh] min-h-[430px] w-full overflow-hidden sm:h-[64vh] lg:h-[72vh] lg:min-h-[620px]">
+        <Image
+          src="/images/hero-conveyor-maintenance.jpg"
+          alt="Dokumentasi pekerjaan teknis CBL pada sistem conveyor"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center transition-transform duration-[1200ms] ease-out motion-safe:hover:scale-[1.015]"
+        />
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent px-4 pb-5 pt-28 sm:px-6 lg:px-8 lg:pb-7">
+          <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 border-t border-white/50 pt-4 text-white sm:flex-row sm:items-end sm:justify-between">
+            <p className="text-xs font-medium uppercase tracking-[0.16em]">Dokumentasi proyek CBL</p>
+            <p className="max-w-md text-xs leading-5 text-white/80 sm:text-right">
+              Sistem conveyor — dokumentasi pekerjaan digunakan sebagai bukti visual, bukan elemen dekoratif.
+            </p>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
