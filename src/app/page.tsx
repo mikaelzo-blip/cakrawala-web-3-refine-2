@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { ExperienceSummarySection } from '@/components/sections/ExperienceSummarySection';
 import { ServicesSection } from '@/components/sections/ServicesSection';
+import { SystemsFocusSection } from '@/components/sections/SystemsFocusSection';
 import { ExpertiseSection } from '@/components/sections/ExpertiseSection';
 import { WorkProcessSection } from '@/components/sections/WorkProcessSection';
 import { BrandSection } from '@/components/sections/BrandSection';
@@ -24,6 +25,7 @@ export default function HomePage() {
       <HeroSection />
       <ExperienceSummarySection />
       <ServicesSection />
+      <SystemsFocusSection />
       <PortfolioSection />
       <WhyUsSection />
       <WorkProcessSection />
