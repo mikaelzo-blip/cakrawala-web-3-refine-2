@@ -1,129 +1,97 @@
-import React from 'react';
 import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
-import { SectionHeading } from '@/components/ui/SectionHeading';
 import { companyInfo } from '@/data/company';
-import { DynamicIcon } from '@/components/ui/DynamicIcon';
 import { ContactForm } from '@/components/forms/ContactForm';
-import { Reveal } from '@/components/ui/Reveal';
 
 export function ContactSection() {
   return (
-    <section id="kontak" className="py-16 md:py-28 bg-white border-b border-[#E2E8F0]">
+    <section id="kontak" className="border-b border-[#D9E1E8] bg-[#F4F1EA] py-20 text-[#102A43] md:py-28 lg:py-32">
       <Container>
-        <Reveal>
-          <SectionHeading
-            badge="Hubungi Tim Teknis"
-            title="Ceritakan kebutuhan teknis fasilitas Anda."
-            description="Sampaikan kondisi peralatan, lokasi, dan target pekerjaan agar pembahasan awal lebih terarah sebelum peninjauan lapangan."
-            align="left"
-          />
-        </Reveal>
+        <div className="grid grid-cols-1 gap-6 border-t border-[#102A43]/20 pt-5 lg:grid-cols-12 lg:gap-8">
+          <div className="lg:col-span-3">
+            <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-[#8C3B16]">Contact</p>
+            <p className="mt-3 max-w-[16rem] text-sm leading-6 text-[#657482]">
+              Jakarta Utara · Indonesia
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
-          {/* Kolom Kiri: Detail Informasi Kontak Legal Perusahaan */}
-          <Reveal className="lg:col-span-5 space-y-6">
-            <div className="p-6 sm:p-8 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm space-y-6">
-              <h3 className="text-xl font-bold text-[#0F2942] tracking-tight border-b border-[#E2E8F0] pb-4">
-                Informasi kontak perusahaan
-              </h3>
+          <div className="lg:col-span-8 lg:col-start-5">
+            <h2 className="max-w-4xl text-[clamp(2.5rem,5vw,5.2rem)] font-semibold leading-[0.96] tracking-[-0.045em]">
+              Ceritakan kondisi fasilitas dan kebutuhan teknis Anda.
+            </h2>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-[#657482] sm:text-lg sm:leading-8">
+              Informasi awal mengenai peralatan, lokasi, dan target pekerjaan membantu pembahasan sebelum peninjauan lapangan.
+            </p>
+          </div>
+        </div>
 
-              <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#F0F7FD] text-[#0E6BA8] flex items-center justify-center shrink-0">
-                    <DynamicIcon name="MapPin" size={20} />
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-bold text-[#0F2942] uppercase tracking-wider">Alamat kantor:</h3>
-                    <p className="text-sm text-[#475569] mt-1 leading-relaxed">{companyInfo.address}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#F0F7FD] text-[#0E6BA8] flex items-center justify-center shrink-0">
-                    <DynamicIcon name="Phone" size={20} />
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-bold text-[#0F2942] uppercase tracking-wider">Telepon Kantor:</h3>
-                    <a href={`tel:${companyInfo.phoneRaw}`} className="text-sm font-semibold text-[#0E6BA8] hover:underline mt-1 block">
-                      {companyInfo.phone}
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-orange-50 text-[#C2410C] flex items-center justify-center shrink-0">
-                    <DynamicIcon name="MessageSquare" size={20} />
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-bold text-[#0F2942] uppercase tracking-wider">WhatsApp:</h3>
-                    <a
-                      href={`https://wa.me/${companyInfo.whatsappNumber}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-bold text-[#C2410C] hover:underline mt-1 block"
-                    >
-                      {companyInfo.whatsappFormatted}
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#F0F7FD] text-[#0E6BA8] flex items-center justify-center shrink-0">
-                    <DynamicIcon name="Mail" size={20} />
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-bold text-[#0F2942] uppercase tracking-wider">Email permintaan penawaran:</h3>
-                    <a href={`mailto:${companyInfo.email}`} className="text-sm font-medium text-[#0E6BA8] hover:underline mt-1 block">
-                      {companyInfo.email}
-                    </a>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#F0F7FD] text-[#0E6BA8] flex items-center justify-center shrink-0">
-                    <DynamicIcon name="Clock" size={20} />
-                  </div>
-                  <div>
-                    <h3 className="text-xs font-bold text-[#0F2942] uppercase tracking-wider">Jam Layanan:</h3>
-                    <p className="text-sm font-semibold text-[#0F2942] mt-1">{companyInfo.serviceHours}</p>
-                  </div>
-                </div>
+        <div className="mt-14 grid grid-cols-1 gap-12 border-t border-[#102A43]/20 pt-8 lg:mt-20 lg:grid-cols-12 lg:gap-10 lg:pt-10">
+          <aside className="lg:col-span-4">
+            <dl>
+              <div className="border-b border-[#102A43]/15 pb-5">
+                <dt className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-[#657482]">Alamat kantor</dt>
+                <dd className="mt-2 max-w-sm text-sm leading-6">{companyInfo.address}</dd>
               </div>
 
-              {/* Tautan Legalitas & Maps */}
-              <div className="pt-4 border-t border-[#E2E8F0] space-y-2">
-                <a
-                  href={`https://maps.google.com/?q=${encodeURIComponent(companyInfo.address)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0] hover:border-[#0E6BA8] text-xs font-semibold text-[#0E6BA8] transition-colors"
-                >
-                  <span className="flex items-center gap-2">
-                    <DynamicIcon name="MapPin" size={16} />
-                    <span>Lihat lokasi di Google Maps</span>
-                  </span>
-                  <DynamicIcon name="ExternalLink" size={14} />
-                </a>
-
-                <Link
-                  href="/legalitas"
-                  className="flex items-center justify-between p-3 rounded-xl bg-[#F0F7FD] border border-[#0E6BA8]/20 hover:bg-[#0E6BA8] hover:text-white text-xs font-semibold text-[#0E6BA8] transition-all group"
-                >
-                  <span className="flex items-center gap-2">
-                    <DynamicIcon name="FileCheck" size={16} />
-                    <span>Informasi legalitas dan registrasi vendor</span>
-                  </span>
-                  <DynamicIcon name="ArrowRight" size={14} className="group-hover:translate-x-1 transition-transform" />
-                </Link>
+              <div className="border-b border-[#102A43]/15 py-5">
+                <dt className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-[#657482]">Telepon</dt>
+                <dd className="mt-2">
+                  <a href={`tel:${companyInfo.phoneRaw}`} className="border-b border-[#102A43]/35 pb-0.5 text-sm font-semibold hover:border-[#8C3B16] hover:text-[#8C3B16]">
+                    {companyInfo.phone}
+                  </a>
+                </dd>
               </div>
+
+              <div className="border-b border-[#102A43]/15 py-5">
+                <dt className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-[#657482]">WhatsApp</dt>
+                <dd className="mt-2">
+                  <a
+                    href={`https://wa.me/${companyInfo.whatsappNumber}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="border-b border-[#8C3B16] pb-0.5 text-sm font-semibold text-[#8C3B16]"
+                  >
+                    {companyInfo.whatsappFormatted} ↗
+                  </a>
+                </dd>
+              </div>
+
+              <div className="border-b border-[#102A43]/15 py-5">
+                <dt className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-[#657482]">Email</dt>
+                <dd className="mt-2 break-words text-sm">
+                  <a href={`mailto:${companyInfo.email}`} className="border-b border-[#102A43]/35 pb-0.5 font-semibold hover:border-[#8C3B16] hover:text-[#8C3B16]">
+                    {companyInfo.email}
+                  </a>
+                </dd>
+              </div>
+
+              <div className="border-b border-[#102A43]/15 py-5">
+                <dt className="text-[0.66rem] font-semibold uppercase tracking-[0.16em] text-[#657482]">Jam layanan</dt>
+                <dd className="mt-2 text-sm leading-6">{companyInfo.serviceHours}</dd>
+              </div>
+            </dl>
+
+            <div className="mt-6 flex flex-col items-start gap-4 text-sm font-semibold">
+              <a
+                href={`https://maps.google.com/?q=${encodeURIComponent(companyInfo.address)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="border-b border-[#102A43]/35 pb-1 transition-colors hover:border-[#8C3B16] hover:text-[#8C3B16]"
+              >
+                Lihat lokasi di Google Maps ↗
+              </a>
+              <Link
+                href="/legalitas"
+                className="border-b border-[#102A43]/35 pb-1 transition-colors hover:border-[#8C3B16] hover:text-[#8C3B16]"
+              >
+                Legalitas & registrasi vendor →
+              </Link>
             </div>
-          </Reveal>
+          </aside>
 
-          {/* Kolom Kanan: Formulir Konsultasi (WA + Mailto) */}
-          <Reveal className="lg:col-span-7" delay={100}>
+          <div className="lg:col-span-7 lg:col-start-6">
             <ContactForm />
-          </Reveal>
+          </div>
         </div>
       </Container>
     </section>
