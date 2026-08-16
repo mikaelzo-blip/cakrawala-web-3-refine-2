@@ -1,6 +1,7 @@
-# K77 DRN90L4 — Blender Scene v1
+# K77-class external reference — Blender Scene v1
 # Generated for CV Cakrawala Buana Lestari
-# Purpose: verified external SEW geometry only.
+# Purpose: verified external reference geometry only.
+# Public render must be unbranded: no manufacturer logo, nameplate, serial label, or product marking.
 # Internal gears/bearings/seals are intentionally NOT fabricated here.
 
 import bpy
@@ -8,6 +9,7 @@ from pathlib import Path
 from mathutils import Vector
 
 ASSET_NAME = "K77_DRN90L4_external_assembly.glb"
+
 
 def find_asset():
     candidates = [
@@ -26,9 +28,11 @@ def find_asset():
         "the current working directory, or next to the .blend file."
     )
 
+
 def clear_scene():
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.object.delete(use_global=False)
+
 
 def mat_principled(name, base, metallic=0.0, roughness=0.45):
     m = bpy.data.materials.get(name) or bpy.data.materials.new(name)
@@ -39,18 +43,22 @@ def mat_principled(name, base, metallic=0.0, roughness=0.45):
     bsdf.inputs["Roughness"].default_value = roughness
     return m
 
+
 def assign_material(obj, mat):
     if obj and obj.type == 'MESH':
         obj.data.materials.clear()
         obj.data.materials.append(mat)
 
+
 def look_at(obj, target):
     direction = Vector(target) - obj.location
     obj.rotation_euler = direction.to_track_quat('-Z', 'Y').to_euler()
 
+
 def key_location(obj, frame, location):
     obj.location = location
     obj.keyframe_insert(data_path="location", frame=frame)
+
 
 def set_interpolation(obj, mode='BEZIER'):
     if obj.animation_data and obj.animation_data.action:
@@ -58,7 +66,8 @@ def set_interpolation(obj, mode='BEZIER'):
             for kp in fc.keyframe_points:
                 kp.interpolation = mode
 
-def create_empty(name, location=(0,0,0), display='PLAIN_AXES', size=35):
+
+def create_empty(name, location=(0, 0, 0), display='PLAIN_AXES', size=35):
     e = bpy.data.objects.new(name, None)
     bpy.context.collection.objects.link(e)
     e.location = location
@@ -66,20 +75,44 @@ def create_empty(name, location=(0,0,0), display='PLAIN_AXES', size=35):
     e.empty_display_size = size
     return e
 
+
+def is_branding_object(name):
+    lower = name.lower()
+    exact = {
+        "terminal_box_label",
+        "nameplate",
+        "motor_nameplate",
+        "manufacturer_label",
+        "serial_label",
+    }
+    return (
+        lower in exact
+        or "nameplate" in lower
+        or "manufacturer_logo" in lower
+        or "sew_logo" in lower
+        or lower.startswith("logo_")
+    )
+
+
 clear_scene()
 asset = find_asset()
 bpy.ops.import_scene.gltf(filepath=str(asset))
 objects = {o.name: o for o in bpy.context.scene.objects if o.type == 'MESH'}
 
 required = [
-    "gearbox_housing", "gearbox_side_cover", "output_shaft",
-    "motor_body", "motor_endshield_or_fan_end",
-    "terminal_box_body", "terminal_box_cover", "terminal_box_label",
-    "motor_adapter_flange"
+    "gearbox_housing",
+    "gearbox_side_cover",
+    "output_shaft",
+    "motor_body",
+    "motor_endshield_or_fan_end",
+    "terminal_box_body",
+    "terminal_box_cover",
+    "motor_adapter_flange",
 ]
 missing = [n for n in required if n not in objects]
 if missing:
     print("WARNING — missing expected objects:", missing)
+
 
 def new_collection(name):
     c = bpy.data.collections.get(name) or bpy.data.collections.new(name)
@@ -87,26 +120,38 @@ def new_collection(name):
         bpy.context.scene.collection.children.link(c)
     return c
 
-verified_col = new_collection("VERIFIED_SEW_EXTERNAL")
+
+verified_col = new_collection("VERIFIED_EXTERNAL_REFERENCE")
 for obj in list(objects.values()):
     for c in list(obj.users_collection):
         c.objects.unlink(obj)
     verified_col.objects.link(obj)
 
-sew_red = mat_principled("SEW_RAL3020_APPROX", (0.72, 0.018, 0.014), 0.05, 0.34)
+housing_gray = mat_principled("HOUSING_NEUTRAL_GRAY", (0.19, 0.215, 0.225), 0.08, 0.46)
+motor_gray = mat_principled("MOTOR_NEUTRAL_GRAY", (0.145, 0.16, 0.17), 0.10, 0.42)
 steel = mat_principled("MACHINED_STEEL", (0.34, 0.37, 0.40), 0.82, 0.24)
 dark_steel = mat_principled("DARK_FASTENER_STEEL", (0.055, 0.065, 0.075), 0.72, 0.31)
-label_mat = mat_principled("LABEL_DARK", (0.04, 0.04, 0.045), 0.15, 0.35)
 
+hidden_branding = []
 for name, obj in objects.items():
+    if is_branding_object(name):
+        obj.hide_render = True
+        obj.hide_viewport = True
+        hidden_branding.append(name)
+        continue
+
+    lower = name.lower()
     if name == "output_shaft":
         assign_material(obj, steel)
-    elif name.startswith("fastener") or "fastener" in name:
+    elif name.startswith("fastener") or "fastener" in lower:
         assign_material(obj, dark_steel)
-    elif name == "terminal_box_label":
-        assign_material(obj, label_mat)
+    elif lower.startswith("motor_") or lower.startswith("terminal_box"):
+        assign_material(obj, motor_gray)
     else:
-        assign_material(obj, sew_red)
+        assign_material(obj, housing_gray)
+
+if hidden_branding:
+    print("Hidden branding objects for public render:", hidden_branding)
 
 scene = bpy.context.scene
 scene.frame_start = 1
@@ -162,6 +207,7 @@ constraint.target = target
 constraint.track_axis = 'TRACK_NEGATIVE_Z'
 constraint.up_axis = 'UP_Y'
 
+
 def area_light(name, location, energy, size, target_point):
     data = bpy.data.lights.new(name=name, type='AREA')
     data.energy = energy
@@ -173,6 +219,7 @@ def area_light(name, location, energy, size, target_point):
     look_at(obj, target_point)
     return obj
 
+
 area_light("KEY_SOFTBOX", (240, -520, 560), 1500, 430, (190, -35, -30))
 area_light("RIM_LIGHT", (590, 320, 270), 1050, 260, (235, -10, -15))
 area_light("FILL_SOFT", (-230, -260, 150), 500, 340, (90, -30, -20))
@@ -182,7 +229,6 @@ motor_names = [
     "motor_endshield_or_fan_end",
     "terminal_box_body",
     "terminal_box_cover",
-    "terminal_box_label",
     "terminal_box_fastener_01",
     "terminal_box_fastener_02",
 ]
@@ -239,14 +285,17 @@ for obj in bpy.context.scene.objects:
                 kp.handle_right_type = 'AUTO_CLAMPED'
 
 scene["CBL_SCENE_STATUS"] = "EXTERNAL_GEOMETRY_VERIFIED_INTERNAL_PENDING"
-scene["CBL_MODEL"] = "SEW K77 DRN90L4"
+scene["CBL_MODEL_REFERENCE"] = "K77-class helical-bevel gearmotor reference"
+scene["CBL_PUBLIC_IDENTITY"] = "UNBRANDED"
 scene["CBL_MOUNTING_POSITION"] = "M1"
 scene["CBL_SHAFT_SIDE"] = "A"
 scene["CBL_DO_NOT_FAKE_INTERNALS"] = True
 scene["CBL_VERIFIED_FRAME_BOUNDARY"] = 85
+scene["CBL_HIDDEN_BRANDING_OBJECTS"] = ",".join(hidden_branding)
 
-save_path = asset.with_name("K77_DRN90L4_scene_v1.blend")
+save_path = asset.with_name("CBL_unbranded_gearmotor_scene_v1.blend")
 bpy.ops.wm.save_as_mainfile(filepath=str(save_path))
 print("DONE:", save_path)
+print("Public render identity: UNBRANDED / neutral industrial gray.")
 print("Verified exterior sequence prepared through frame 85.")
 print("Frames 86–145 intentionally hold until verified internal geometry/reference is available.")
