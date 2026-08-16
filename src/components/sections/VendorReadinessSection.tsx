@@ -1,47 +1,60 @@
 import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
-import { DynamicIcon } from '@/components/ui/DynamicIcon';
-import { Reveal } from '@/components/ui/Reveal';
 import { legalDocuments } from '@/data/legal';
 
 export function VendorReadinessSection() {
   return (
-    <section className="py-16 md:py-24 bg-[#F3F7FA] border-y border-[#E2E8F0]">
+    <section className="border-b border-[#D9E1E8] bg-[#F4F1EA] py-20 text-[#102A43] md:py-24 lg:py-28">
       <Container>
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
-          <Reveal className="lg:col-span-5">
-            <span className="eyebrow-label">Kelengkapan Administrasi Vendor</span>
-            <h2 className="mt-5 text-3xl sm:text-4xl font-black tracking-tight text-[#0F2942] leading-tight">
-              Informasi legal untuk mendukung proses pengadaan dan registrasi vendor.
-            </h2>
-            <p className="mt-5 text-base leading-relaxed text-[#475569]">
-              Jenis dokumen perusahaan ditampilkan secara ringkas. Salinan yang memuat data sensitif hanya disampaikan melalui permintaan resmi untuk keperluan registrasi vendor.
+        <div className="grid grid-cols-1 gap-6 border-t border-[#102A43]/20 pt-5 lg:grid-cols-12 lg:gap-8">
+          <div className="lg:col-span-3">
+            <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-[#8C3B16]">Vendor readiness</p>
+            <p className="mt-3 max-w-[16rem] text-sm leading-6 text-[#657482]">
+              Informasi administratif untuk mendukung proses pengadaan dan registrasi resmi.
             </p>
-            <Link
-              href="/legalitas"
-              className="mt-7 inline-flex items-center gap-2 rounded-xl bg-[#0F2942] px-5 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#15426B] hover:shadow-lg"
-            >
-              Lihat informasi legalitas
-              <DynamicIcon name="ArrowUpRight" size={17} />
-            </Link>
-          </Reveal>
-
-          <div className="lg:col-span-7 grid gap-4">
-            {legalDocuments.map((document, index) => (
-              <Reveal key={document.id} delay={index * 80}>
-                <div className="group flex items-start gap-4 rounded-2xl border border-[#D9E5EF] bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#0E6BA8]/35 hover:shadow-md">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#F0F7FD] text-[#0E6BA8] transition-colors group-hover:bg-[#0E6BA8] group-hover:text-white">
-                    <DynamicIcon name="FileCheck2" size={21} />
-                  </div>
-                  <div>
-                    <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#0E6BA8]">{document.category}</span>
-                    <h3 className="mt-1 text-base font-bold text-[#0F2942]">{document.title}</h3>
-                    <p className="mt-1 text-sm leading-relaxed text-[#475569]">Dapat ditinjau sesuai kebutuhan proses registrasi resmi.</p>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
           </div>
+
+          <div className="lg:col-span-8 lg:col-start-5">
+            <h2 className="max-w-4xl text-[clamp(2.3rem,4.5vw,4.8rem)] font-semibold leading-[0.98] tracking-[-0.04em]">
+              Dokumen legal disampaikan sesuai kebutuhan proses vendor.
+            </h2>
+            <p className="mt-6 max-w-2xl text-sm leading-7 text-[#657482] sm:text-base">
+              Informasi perusahaan ditampilkan secara ringkas. Salinan yang memuat data sensitif hanya disampaikan melalui permintaan resmi.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-14 border-t border-[#102A43]/20 md:mt-18">
+          {legalDocuments.map((document, index) => (
+            <div
+              key={document.id}
+              className="grid grid-cols-1 gap-3 border-b border-[#102A43]/20 py-6 md:grid-cols-12 md:items-center md:gap-8 md:py-7"
+            >
+              <div className="md:col-span-1">
+                <span className="text-[0.66rem] font-semibold tracking-[0.16em] text-[#8C3B16]">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+              </div>
+              <div className="md:col-span-3">
+                <p className="text-[0.66rem] font-semibold uppercase tracking-[0.14em] text-[#657482]">{document.category}</p>
+              </div>
+              <div className="md:col-span-6">
+                <h3 className="text-lg font-semibold tracking-[-0.02em] sm:text-xl">{document.title}</h3>
+              </div>
+              <div className="md:col-span-2 md:text-right">
+                <span className="text-xs text-[#657482]">Tersedia sesuai kebutuhan</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-7 flex justify-end">
+          <Link
+            href="/legalitas"
+            className="inline-flex border-b border-[#8C3B16] pb-1 text-sm font-semibold text-[#8C3B16] transition-colors hover:text-[#6F2E12]"
+          >
+            Informasi legalitas lengkap →
+          </Link>
         </div>
       </Container>
     </section>
