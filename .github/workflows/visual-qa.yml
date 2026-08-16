@@ -6,7 +6,9 @@ on:
       - design/human-art-direction
     paths:
       - src/components/sections/HeroSection.tsx
-      - src/components/visuals/IndustrialGearbox3D.tsx
+      - src/components/visuals/GearmotorRenderSequence.tsx
+      - src/components/ui/BackToTop.tsx
+      - public/images/gearmotor/**
       - .github/workflows/visual-qa.yml
 
 permissions:
