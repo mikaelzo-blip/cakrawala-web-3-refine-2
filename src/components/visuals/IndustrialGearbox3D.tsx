@@ -13,7 +13,23 @@ type Geometry = {
   normals: number[];
 };
 
+type IndustrialGearbox3DProps = {
+  progress?: number;
+  activeStep?: number;
+};
+
+type Vec3 = [number, number, number];
+
 const TAU = Math.PI * 2;
+
+function clamp01(value: number) {
+  return Math.max(0, Math.min(1, value));
+}
+
+function smoothstep(start: number, end: number, value: number) {
+  const t = clamp01((value - start) / Math.max(0.0001, end - start));
+  return t * t * (3 - 2 * t);
+}
 
 function mat4Identity() {
   return new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
@@ -74,11 +90,7 @@ function mat4Perspective(fov: number, aspect: number, near: number, far: number)
   ]);
 }
 
-function compose(
-  position: [number, number, number],
-  rotation: [number, number, number],
-  scale: [number, number, number]
-) {
+function compose(position: Vec3, rotation: Vec3, scale: Vec3) {
   let matrix = mat4Translation(...position);
   matrix = mat4Multiply(matrix, mat4RotationY(rotation[1]));
   matrix = mat4Multiply(matrix, mat4RotationX(rotation[0]));
@@ -89,7 +101,7 @@ function compose(
 function createBoxGeometry(): Geometry {
   const positions: number[] = [];
   const normals: number[] = [];
-  const faces: Array<{ normal: [number, number, number]; corners: Array<[number, number, number]> }> = [
+  const faces: Array<{ normal: Vec3; corners: Vec3[] }> = [
     { normal: [0, 0, 1], corners: [[-0.5, -0.5, 0.5], [0.5, -0.5, 0.5], [0.5, 0.5, 0.5], [-0.5, 0.5, 0.5]] },
     { normal: [0, 0, -1], corners: [[0.5, -0.5, -0.5], [-0.5, -0.5, -0.5], [-0.5, 0.5, -0.5], [0.5, 0.5, -0.5]] },
     { normal: [1, 0, 0], corners: [[0.5, -0.5, 0.5], [0.5, -0.5, -0.5], [0.5, 0.5, -0.5], [0.5, 0.5, 0.5]] },
@@ -106,7 +118,7 @@ function createBoxGeometry(): Geometry {
   return { positions, normals };
 }
 
-function createCylinderGeometry(segments = 40): Geometry {
+function createCylinderGeometry(segments = 36): Geometry {
   const positions: number[] = [];
   const normals: number[] = [];
   for (let i = 0; i < segments; i += 1) {
@@ -129,12 +141,39 @@ function createCylinderGeometry(segments = 40): Geometry {
   return { positions, normals };
 }
 
+function createRingGeometry(segments = 40, innerRadius = 0.62): Geometry {
+  const positions: number[] = [];
+  const normals: number[] = [];
+  for (let i = 0; i < segments; i += 1) {
+    const a0 = (i / segments) * TAU;
+    const a1 = ((i + 1) / segments) * TAU;
+    const o0: [number, number] = [Math.cos(a0), Math.sin(a0)];
+    const o1: [number, number] = [Math.cos(a1), Math.sin(a1)];
+    const i0: [number, number] = [o0[0] * innerRadius, o0[1] * innerRadius];
+    const i1: [number, number] = [o1[0] * innerRadius, o1[1] * innerRadius];
+
+    positions.push(o0[0], 1, o0[1], o1[0], 1, o1[1], i1[0], 1, i1[1], o0[0], 1, o0[1], i1[0], 1, i1[1], i0[0], 1, i0[1]);
+    for (let n = 0; n < 6; n += 1) normals.push(0, 1, 0);
+
+    positions.push(o1[0], -1, o1[1], o0[0], -1, o0[1], i0[0], -1, i0[1], o1[0], -1, o1[1], i0[0], -1, i0[1], i1[0], -1, i1[1]);
+    for (let n = 0; n < 6; n += 1) normals.push(0, -1, 0);
+
+    positions.push(o0[0], -1, o0[1], o1[0], -1, o1[1], o1[0], 1, o1[1], o0[0], -1, o0[1], o1[0], 1, o1[1], o0[0], 1, o0[1]);
+    for (let n = 0; n < 6; n += 1) normals.push(o0[0], 0, o0[1]);
+
+    positions.push(i1[0], -1, i1[1], i0[0], -1, i0[1], i0[0], 1, i0[1], i1[0], -1, i1[1], i0[0], 1, i0[1], i1[0], 1, i1[1]);
+    for (let n = 0; n < 6; n += 1) normals.push(-o0[0], 0, -o0[1]);
+  }
+  return { positions, normals };
+}
+
 function createShader(gl: WebGLRenderingContext, type: number, source: string) {
   const shader = gl.createShader(type);
   if (!shader) return null;
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    console.error(gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
     return null;
   }
@@ -154,10 +193,14 @@ function createMesh(gl: WebGLRenderingContext, geometry: Geometry): Mesh | null 
   return { position, normal, count: geometry.positions.length / 3 };
 }
 
-export function IndustrialGearbox3D() {
+export function IndustrialGearbox3D({ progress = 0, activeStep = 0 }: IndustrialGearbox3DProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const pointerRef = useRef({ x: 0, y: 0, dragging: false, lastX: 0, lastY: 0 });
-  const rotationRef = useRef({ x: -0.18, y: -0.6, targetX: -0.18, targetY: -0.6 });
+  const progressRef = useRef(progress);
+  const activeStepRef = useRef(activeStep);
+  const pointerRef = useRef({ dragging: false, lastX: 0, lastY: 0, x: 0, y: 0 });
+
+  progressRef.current = progress;
+  activeStepRef.current = activeStep;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -172,10 +215,8 @@ export function IndustrialGearbox3D() {
       uniform mat4 uView;
       uniform mat4 uModel;
       varying vec3 vNormal;
-      varying vec3 vWorldPosition;
       void main() {
         vec4 world = uModel * vec4(aPosition, 1.0);
-        vWorldPosition = world.xyz;
         vNormal = normalize(mat3(uModel) * aNormal);
         gl_Position = uProjection * uView * world;
       }
@@ -183,17 +224,17 @@ export function IndustrialGearbox3D() {
     const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, `
       precision mediump float;
       uniform vec3 uColor;
+      uniform float uAlpha;
       varying vec3 vNormal;
-      varying vec3 vWorldPosition;
       void main() {
         vec3 n = normalize(vNormal);
-        vec3 key = normalize(vec3(-0.7, 1.0, 0.8));
-        vec3 rim = normalize(vec3(0.8, 0.35, -0.55));
+        vec3 key = normalize(vec3(-0.55, 0.9, 0.75));
+        vec3 fill = normalize(vec3(0.7, 0.2, -0.55));
         float diffuse = max(dot(n, key), 0.0);
-        float edge = pow(1.0 - abs(dot(n, normalize(vec3(0.0, 0.0, 1.0)))), 2.0);
-        float rimLight = max(dot(n, rim), 0.0) * 0.18;
-        vec3 color = uColor * (0.42 + diffuse * 0.62 + rimLight) + edge * vec3(0.09, 0.11, 0.12);
-        gl_FragColor = vec4(color, 1.0);
+        float secondary = max(dot(n, fill), 0.0) * 0.12;
+        float rim = pow(1.0 - abs(n.z), 2.0) * 0.08;
+        vec3 color = uColor * (0.43 + diffuse * 0.62 + secondary) + rim;
+        gl_FragColor = vec4(color, uAlpha);
       }
     `);
 
@@ -203,11 +244,15 @@ export function IndustrialGearbox3D() {
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return;
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      console.error(gl.getProgramInfoLog(program));
+      return;
+    }
 
     const box = createMesh(gl, createBoxGeometry());
     const cylinder = createMesh(gl, createCylinderGeometry());
-    if (!box || !cylinder) return;
+    const ring = createMesh(gl, createRingGeometry());
+    if (!box || !cylinder || !ring) return;
 
     const positionLocation = gl.getAttribLocation(program, 'aPosition');
     const normalLocation = gl.getAttribLocation(program, 'aNormal');
@@ -215,12 +260,23 @@ export function IndustrialGearbox3D() {
     const viewLocation = gl.getUniformLocation(program, 'uView');
     const modelLocation = gl.getUniformLocation(program, 'uModel');
     const colorLocation = gl.getUniformLocation(program, 'uColor');
-    if (!projectionLocation || !viewLocation || !modelLocation || !colorLocation) return;
+    const alphaLocation = gl.getUniformLocation(program, 'uAlpha');
+    if (!projectionLocation || !viewLocation || !modelLocation || !colorLocation || !alphaLocation) return;
 
     gl.useProgram(program);
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
     gl.cullFace(gl.BACK);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    const darkMetal: Vec3 = [0.25, 0.28, 0.29];
+    const housingMetal: Vec3 = [0.40, 0.43, 0.44];
+    const motorMetal: Vec3 = [0.43, 0.46, 0.47];
+    const steel: Vec3 = [0.62, 0.65, 0.66];
+    const gearSteel: Vec3 = [0.52, 0.55, 0.56];
+    const rubber: Vec3 = [0.08, 0.09, 0.10];
+    const accent: Vec3 = [0.60, 0.23, 0.075];
 
     const bindMesh = (mesh: Mesh) => {
       gl.bindBuffer(gl.ARRAY_BUFFER, mesh.position);
@@ -231,32 +287,28 @@ export function IndustrialGearbox3D() {
       gl.vertexAttribPointer(normalLocation, 3, gl.FLOAT, false, 0, 0);
     };
 
-    const draw = (mesh: Mesh, model: Float32Array, color: [number, number, number]) => {
+    const draw = (mesh: Mesh, model: Float32Array, color: Vec3, alpha = 1) => {
       bindMesh(mesh);
       gl.uniformMatrix4fv(modelLocation, false, model);
       gl.uniform3fv(colorLocation, color);
+      gl.uniform1f(alphaLocation, alpha);
       gl.drawArrays(gl.TRIANGLES, 0, mesh.count);
     };
 
-    const darkMetal: [number, number, number] = [0.12, 0.19, 0.23];
-    const midMetal: [number, number, number] = [0.25, 0.31, 0.33];
-    const steel: [number, number, number] = [0.47, 0.5, 0.49];
-    const orange: [number, number, number] = [0.78, 0.24, 0.055];
-    const nearBlack: [number, number, number] = [0.06, 0.075, 0.08];
-
     let animationFrame = 0;
     let visible = true;
-    let lastTime = performance.now();
+    let currentX = -0.14;
+    let currentY = -0.72;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const observer = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
-    }, { threshold: 0.05 });
+    }, { threshold: 0.02 });
     observer.observe(canvas);
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.6);
       const width = Math.max(1, Math.floor(rect.width * dpr));
       const height = Math.max(1, Math.floor(rect.height * dpr));
       if (canvas.width !== width || canvas.height !== height) {
@@ -266,54 +318,94 @@ export function IndustrialGearbox3D() {
       gl.viewport(0, 0, width, height);
     };
 
-    const render = (time: number) => {
+    const render = () => {
       animationFrame = requestAnimationFrame(render);
       if (!visible) return;
       resize();
 
-      const delta = Math.min((time - lastTime) / 1000, 0.05);
-      lastTime = time;
+      const rawProgress = clamp01(progressRef.current);
+      const visualProgress = reducedMotion ? Math.round(rawProgress * 9) / 9 : rawProgress;
+      const step = activeStepRef.current;
       const pointer = pointerRef.current;
-      const rotation = rotationRef.current;
-      if (!pointer.dragging && !reducedMotion) rotation.targetY += delta * 0.12;
-      rotation.x += (rotation.targetX - rotation.x) * 0.075;
-      rotation.y += (rotation.targetY - rotation.y) * 0.075;
+
+      const motorSeparate = smoothstep(0.09, 0.22, visualProgress);
+      const housingOpen = smoothstep(0.18, 0.34, visualProgress);
+      const internalsOpen = smoothstep(0.28, 0.63, visualProgress);
+      const reassemble = smoothstep(0.80, 0.97, visualProgress);
+      const explode = internalsOpen * (1 - reassemble);
+      const externalOpen = 1 - reassemble;
+      const housingAlpha = 1 - housingOpen * externalOpen * 0.72;
+
+      const desiredY = -0.72 + visualProgress * 0.22 + pointer.x;
+      const desiredX = -0.16 + Math.sin(visualProgress * Math.PI) * 0.08 + pointer.y;
+      currentY += (desiredY - currentY) * (reducedMotion ? 1 : 0.08);
+      currentX += (desiredX - currentX) * (reducedMotion ? 1 : 0.08);
 
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
       const aspect = canvas.width / canvas.height;
-      gl.uniformMatrix4fv(projectionLocation, false, mat4Perspective(Math.PI / 4.2, aspect, 0.1, 100));
-      gl.uniformMatrix4fv(viewLocation, false, mat4Translation(0, -0.15, -11.4));
+      const cameraDistance = aspect < 0.85 ? -12.2 : -10.6;
+      gl.uniformMatrix4fv(projectionLocation, false, mat4Perspective(Math.PI / 4.1, aspect, 0.1, 100));
+      gl.uniformMatrix4fv(viewLocation, false, mat4Translation(aspect < 0.85 ? -0.15 : 0.35, -0.15, cameraDistance));
 
-      const root = mat4Multiply(mat4RotationY(rotation.y), mat4RotationX(rotation.x));
-      const part = (
-        mesh: Mesh,
-        position: [number, number, number],
-        rotationValue: [number, number, number],
-        scale: [number, number, number],
-        color: [number, number, number]
-      ) => draw(mesh, mat4Multiply(root, compose(position, rotationValue, scale)), color);
+      const root = mat4Multiply(mat4RotationY(currentY), mat4RotationX(currentX));
+      const part = (mesh: Mesh, position: Vec3, rotation: Vec3, scale: Vec3, color: Vec3, alpha = 1) => {
+        draw(mesh, mat4Multiply(root, compose(position, rotation, scale)), color, alpha);
+      };
+      const tone = (targetStep: number, base: Vec3) => (step === targetStep ? accent : base);
 
-      part(box, [0, -2.0, 0], [0, 0, 0], [5.0, 0.35, 3.05], nearBlack);
-      part(box, [-0.25, -0.5, 0], [0, 0.03, 0], [3.3, 2.75, 2.25], darkMetal);
-      part(box, [-0.25, 1.08, 0], [0, 0.03, 0], [2.45, 0.48, 1.75], midMetal);
-      part(box, [-0.25, 1.45, 0], [0, 0.03, 0], [1.4, 0.24, 1.05], orange);
+      const motorShift = 1.45 * motorSeparate * externalOpen;
+      const coverShift = -1.05 * housingOpen * externalOpen;
 
-      part(cylinder, [-0.28, -0.45, 1.28], [Math.PI / 2, 0, 0], [1.22, 0.22, 1.22], midMetal);
-      part(cylinder, [-0.28, -0.45, 1.55], [Math.PI / 2, 0, 0], [0.73, 0.19, 0.73], nearBlack);
-      part(cylinder, [-0.28, -0.45, 1.8], [Math.PI / 2, 0, 0], [0.35, 0.42, 0.35], steel);
+      gl.depthMask(true);
+      part(cylinder, [0.58 + explode * 0.24, 0, 0.16], [0, 0, Math.PI / 2], [0.13, 0.82, 0.13], tone(2, steel));
+      part(cylinder, [-0.02 + explode * 0.12, 0, 0.16], [0, 0, Math.PI / 2], [0.34, 0.11, 0.34], tone(2, gearSteel));
 
-      part(cylinder, [2.05, -0.35, 0], [0, 0, Math.PI / 2], [0.62, 0.78, 0.62], steel);
-      part(cylinder, [2.9, -0.35, 0], [0, 0, Math.PI / 2], [0.93, 0.72, 0.93], darkMetal);
-      part(cylinder, [3.62, -0.35, 0], [0, 0, Math.PI / 2], [0.72, 0.18, 0.72], orange);
+      part(cylinder, [-0.34 - explode * 0.12, 0.30 + explode * 0.22, -0.30], [0, 0, Math.PI / 2], [0.55, 0.12, 0.55], tone(3, gearSteel));
+      for (let i = 0; i < 14; i += 1) {
+        const a = (i / 14) * TAU;
+        part(box, [-0.34 - explode * 0.12, 0.30 + Math.cos(a) * 0.54 + explode * 0.22, -0.30 + Math.sin(a) * 0.54], [a, 0, 0], [0.20, 0.12, 0.09], tone(3, gearSteel));
+      }
+      part(cylinder, [-0.30 - explode * 0.12, 0.30 + explode * 0.22, -0.30], [0, 0, Math.PI / 2], [0.12, 0.70, 0.12], tone(3, steel));
 
-      part(cylinder, [-2.0, -0.55, 0], [0, 0, Math.PI / 2], [0.46, 0.55, 0.46], steel);
-      part(cylinder, [-2.58, -0.55, 0], [0, 0, Math.PI / 2], [0.32, 0.42, 0.32], orange);
+      part(cylinder, [-0.55 - explode * 0.24, 0.18, -0.18], [0, 0, Math.PI / 2], [0.31, 0.11, 0.31], tone(4, gearSteel));
+      part(cylinder, [-0.55, -0.24 - explode * 0.20, -0.18], [0, 0, 0], [0.50, 0.12, 0.50], tone(4, gearSteel));
 
-      const boltPositions: Array<[number, number]> = [[-1.05, 0.38], [0.5, 0.38], [-1.05, -1.25], [0.5, -1.25]];
-      for (const [x, y] of boltPositions) {
-        part(cylinder, [x, y, 1.56], [Math.PI / 2, 0, 0], [0.11, 0.08, 0.11], steel);
+      part(cylinder, [-0.55, -0.88 - explode * 0.32, -0.18], [0, 0, 0], [0.17, 0.86, 0.17], tone(7, steel));
+      part(ring, [-0.55, -0.48 - explode * 0.12, -0.18], [0, 0, 0], [0.39, 0.10, 0.39], tone(5, steel));
+      part(ring, [-0.55, 0.20 + explode * 0.10, -0.18], [0, 0, 0], [0.39, 0.10, 0.39], tone(5, steel));
+      part(ring, [-0.55, -1.38 - explode * 0.40, -0.18], [0, 0, 0], [0.33, 0.07, 0.33], tone(6, rubber));
+
+      gl.depthMask(housingAlpha > 0.95);
+      part(box, [-0.48, 0, -0.08], [0, 0.02, 0], [1.72, 1.46, 1.55], tone(8, housingMetal), housingAlpha);
+      part(box, [-0.48, 0, -1.05], [0, 0.02, 0], [2.02, 1.56, 0.36], tone(8, darkMetal), housingAlpha);
+      part(box, [-0.48, 0, 0.92], [0, 0.02, 0], [1.18, 1.02, 0.32], tone(8, housingMetal), housingAlpha);
+      part(cylinder, [-0.55, -0.88, -0.18], [0, 0, 0], [0.78, 0.20, 0.78], tone(8, darkMetal), housingAlpha);
+      part(cylinder, [-0.55, -1.18 + coverShift, -0.18], [0, 0, 0], [0.67, 0.09, 0.67], tone(8, housingMetal), Math.max(0.35, housingAlpha));
+
+      for (let i = 0; i < 4; i += 1) {
+        part(box, [-1.36, 0, -0.58 + i * 0.36], [0, 0.02, 0], [0.10, 1.48, 0.08], tone(8, darkMetal), housingAlpha);
+      }
+      for (const [x, z] of [[-1.05, -1.22], [0.06, -1.22]] as Array<[number, number]>) {
+        part(box, [x, -0.55, z], [0, 0, 0], [0.42, 0.34, 0.16], darkMetal, 1);
+        part(box, [x, 0.55, z], [0, 0, 0], [0.42, 0.34, 0.16], darkMetal, 1);
+      }
+      gl.depthMask(true);
+
+      const motorX = 1.78 + motorShift;
+      part(cylinder, [0.58 + motorShift * 0.30, 0, 0.13], [0, 0, Math.PI / 2], [0.68, 0.12, 0.68], tone(1, darkMetal));
+      part(cylinder, [motorX, 0, 0.13], [0, 0, Math.PI / 2], [0.64, 1.32, 0.64], tone(1, motorMetal));
+      for (let i = 0; i < 8; i += 1) {
+        part(cylinder, [1.06 + i * 0.22 + motorShift, 0, 0.13], [0, 0, Math.PI / 2], [0.69, 0.035, 0.69], tone(1, motorMetal));
+      }
+      part(cylinder, [3.05 + motorShift, 0, 0.13], [0, 0, Math.PI / 2], [0.67, 0.22, 0.67], tone(1, darkMetal));
+      part(box, [1.75 + motorShift, 0, 0.95], [0, 0, 0], [0.58, 0.62, 0.38], tone(1, darkMetal));
+      part(box, [1.75 + motorShift, 0, 1.18], [0, 0, 0], [0.62, 0.66, 0.07], tone(1, steel));
+
+      for (let i = 0; i < 6; i += 1) {
+        const a = (i / 6) * TAU;
+        part(cylinder, [-0.55 + Math.cos(a) * 0.57, -1.31 + coverShift, -0.18 + Math.sin(a) * 0.57], [0, 0, 0], [0.055, 0.06, 0.055], steel, 1);
       }
     };
 
@@ -332,8 +424,8 @@ export function IndustrialGearbox3D() {
       const dy = event.clientY - pointer.lastY;
       pointer.lastX = event.clientX;
       pointer.lastY = event.clientY;
-      rotationRef.current.targetY += dx * 0.008;
-      rotationRef.current.targetX = Math.max(-0.7, Math.min(0.45, rotationRef.current.targetX + dy * 0.006));
+      pointer.x = Math.max(-0.45, Math.min(0.45, pointer.x + dx * 0.004));
+      pointer.y = Math.max(-0.24, Math.min(0.24, pointer.y + dy * 0.003));
     };
     const onPointerUp = (event: PointerEvent) => {
       pointerRef.current.dragging = false;
@@ -352,10 +444,10 @@ export function IndustrialGearbox3D() {
       canvas.removeEventListener('pointermove', onPointerMove);
       canvas.removeEventListener('pointerup', onPointerUp);
       canvas.removeEventListener('pointercancel', onPointerUp);
-      gl.deleteBuffer(box.position);
-      gl.deleteBuffer(box.normal);
-      gl.deleteBuffer(cylinder.position);
-      gl.deleteBuffer(cylinder.normal);
+      for (const mesh of [box, cylinder, ring]) {
+        gl.deleteBuffer(mesh.position);
+        gl.deleteBuffer(mesh.normal);
+      }
       gl.deleteProgram(program);
       gl.deleteShader(vertexShader);
       gl.deleteShader(fragmentShader);
@@ -363,20 +455,15 @@ export function IndustrialGearbox3D() {
   }, []);
 
   return (
-    <div className="relative h-full min-h-[390px] w-full select-none sm:min-h-[470px] lg:min-h-[590px]">
-      <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(rgba(16,42,67,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(16,42,67,0.07)_1px,transparent_1px)] bg-[size:42px_42px] [mask-image:radial-gradient(circle_at_center,black,transparent_78%)]" />
-      <div aria-hidden="true" className="absolute left-1/2 top-1/2 h-[68%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#102A43]/15" />
-      <div aria-hidden="true" className="absolute left-1/2 top-1/2 h-[49%] aspect-square -translate-x-1/2 -translate-y-1/2 rounded-full border border-[#102A43]/10" />
-
+    <div className="relative h-full min-h-[360px] w-full select-none sm:min-h-[430px] lg:min-h-[560px]">
       <canvas
         ref={canvasRef}
-        className="relative z-10 h-full min-h-[390px] w-full cursor-grab touch-none active:cursor-grabbing sm:min-h-[470px] lg:min-h-[590px]"
-        aria-label="Model tiga dimensi gearbox dan sistem transmisi industri"
+        className="relative z-10 h-full min-h-[360px] w-full cursor-grab touch-none active:cursor-grabbing sm:min-h-[430px] lg:min-h-[560px]"
+        aria-label="Visualisasi teknis tiga dimensi gearmotor industri tanpa merek"
       />
-
-      <div className="pointer-events-none absolute inset-x-0 bottom-3 z-20 flex items-end justify-between border-t border-[#102A43]/20 pt-3 text-[0.64rem] font-semibold uppercase tracking-[0.16em] text-[#536474] sm:bottom-5">
-        <span>Gearbox / transmission system</span>
-        <span className="hidden sm:inline">Drag to inspect · WebGL</span>
+      <div className="pointer-events-none absolute inset-x-0 bottom-2 z-20 flex items-center justify-between border-t border-[#102A43]/18 pt-3 text-[0.58rem] font-semibold uppercase tracking-[0.16em] text-[#536474] sm:bottom-4">
+        <span>Technical drivetrain visualization</span>
+        <span className="hidden sm:inline">Drag gently to inspect</span>
       </div>
     </div>
   );
