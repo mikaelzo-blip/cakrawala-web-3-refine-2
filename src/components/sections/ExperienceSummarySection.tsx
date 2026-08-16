@@ -1,37 +1,35 @@
 import { Container } from '@/components/ui/Container';
-import { DynamicIcon } from '@/components/ui/DynamicIcon';
-import { Reveal } from '@/components/ui/Reveal';
 import { projects } from '@/data/projects';
 import { serviceDivisions } from '@/data/company';
 
 const summaryItems = [
-  { value: '2022–2026', label: 'Periode pekerjaan terdokumentasi', icon: 'CalendarDays' },
-  { value: `${projects.length}`, label: 'Studi kasus yang dipublikasikan', icon: 'BriefcaseBusiness' },
-  { value: `${serviceDivisions.length}`, label: 'Bidang layanan teknis', icon: 'Layers3' },
-  { value: 'Berbasis proyek', label: 'Tenaga profesional sesuai kebutuhan', icon: 'Users' },
+  { value: '2022–2026', label: 'Periode pekerjaan terdokumentasi' },
+  { value: `${projects.length}`, label: 'Studi kasus yang dipublikasikan' },
+  { value: `${serviceDivisions.length}`, label: 'Bidang layanan teknis' },
+  { value: 'Berbasis proyek', label: 'Tenaga profesional sesuai kebutuhan' },
 ];
 
 export function ExperienceSummarySection() {
   return (
-    <section aria-label="Ringkasan pengalaman CBL" className="relative z-20 -mt-8 pb-14 md:-mt-12 md:pb-20">
+    <section aria-label="Ringkasan pengalaman CBL" className="border-b border-[#D9E1E8] bg-white text-[#102A43]">
       <Container>
-        <Reveal>
-          <div className="grid grid-cols-2 lg:grid-cols-4 overflow-hidden rounded-3xl border border-[#D9E5EF] bg-white shadow-[0_24px_70px_-34px_rgba(15,41,66,0.4)]">
-            {summaryItems.map((item, index) => (
-              <div
-                key={item.label}
-                className="relative p-5 sm:p-6 lg:p-7 border-b border-r border-[#E2E8F0] even:border-r-0 lg:border-b-0 lg:even:border-r lg:last:border-r-0 last:border-b-0"
-              >
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#F0F7FD] text-[#0E6BA8]">
-                  <DynamicIcon name={item.icon} size={20} />
-                </div>
-                <div className="text-xl sm:text-2xl font-black tracking-tight text-[#0F2942]">{item.value}</div>
-                <p className="mt-1 text-xs sm:text-sm leading-relaxed text-[#475569]">{item.label}</p>
-                <span className="absolute right-4 top-4 text-[10px] font-bold text-[#0E6BA8]/35">0{index + 1}</span>
+        <div className="grid grid-cols-1 border-x border-[#D9E1E8] sm:grid-cols-2 lg:grid-cols-4">
+          {summaryItems.map((item, index) => (
+            <div
+              key={item.label}
+              className="min-h-[10rem] border-b border-[#D9E1E8] p-5 sm:min-h-[11rem] sm:p-6 sm:[&:nth-child(odd)]:border-r lg:border-b-0 lg:border-r lg:p-7 lg:[&:nth-child(odd)]:border-r lg:last:border-r-0"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <span className="text-[0.65rem] font-semibold tracking-[0.16em] text-[#8C3B16]">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <span className="h-px w-8 bg-[#8C3B16]/45" aria-hidden="true" />
               </div>
-            ))}
-          </div>
-        </Reveal>
+              <p className="mt-7 text-2xl font-semibold tracking-[-0.035em] sm:text-[1.65rem]">{item.value}</p>
+              <p className="mt-2 max-w-[15rem] text-xs leading-5 text-[#657482] sm:text-sm sm:leading-6">{item.label}</p>
+            </div>
+          ))}
+        </div>
       </Container>
     </section>
   );
