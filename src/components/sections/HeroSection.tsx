@@ -126,6 +126,7 @@ export function HeroSection() {
 
   return (
     <section
+      id="immersive-gearmotor"
       ref={sectionRef}
       className="relative h-[700svh] w-full overflow-x-clip bg-[#F1EFE9] text-[#102A43]"
       aria-label="Visualisasi interaktif sistem gearmotor CBL"
