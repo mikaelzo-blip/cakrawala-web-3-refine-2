@@ -1,0 +1,37 @@
+name: CBL Gearmotor Render QA
+
+on:
+  push:
+    branches:
+      - design/human-art-direction
+    paths:
+      - scripts/blender/generate_cbl_concept_renders.py
+      - .github/workflows/gearmotor-render-qa.yml
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Blender
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y blender
+          blender --version
+
+      - name: Render ten technical states
+        run: blender --background --python scripts/blender/generate_cbl_concept_renders.py
+
+      - name: Upload render QA
+        uses: actions/upload-artifact@v4
+        with:
+          name: cbl-gearmotor-render-qa
+          path: /tmp/cbl-gearmotor-renders/*.png
+          retention-days: 3
