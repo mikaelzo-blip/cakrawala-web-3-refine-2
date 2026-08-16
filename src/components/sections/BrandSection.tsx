@@ -1,73 +1,57 @@
-import React from 'react';
 import Image from 'next/image';
 import { Container } from '@/components/ui/Container';
-import { SectionHeading } from '@/components/ui/SectionHeading';
 import { brandItems, brandDisclaimer } from '@/data/company';
-import { Reveal } from '@/components/ui/Reveal';
 
 export function BrandSection() {
   return (
-    <section className="py-16 md:py-24 bg-[#F7FAFC] border-b border-[#E2E8F0] overflow-hidden">
+    <section className="border-b border-[#D9E1E8] bg-white py-20 text-[#102A43] md:py-24 lg:py-28">
       <Container>
-        <Reveal>
-          <SectionHeading
-            badge="Cakupan Komponen &amp; Suku Cadang"
-            title="Merek komponen yang pernah kami tangani."
-            description="Daftar ini menunjukkan pengalaman CBL dalam menangani berbagai spesifikasi komponen. Pencantuman logo tidak menyatakan hubungan distributor atau kemitraan resmi."
-            align="left"
-          />
-        </Reveal>
-      </Container>
+        <div className="grid grid-cols-1 gap-6 border-t border-[#102A43]/20 pt-5 lg:grid-cols-12 lg:gap-8">
+          <div className="lg:col-span-3">
+            <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-[#8C3B16]">Technical ecosystem</p>
+            <p className="mt-3 max-w-[16rem] text-sm leading-6 text-[#657482]">
+              Komponen dan merek yang pernah muncul dalam kebutuhan pekerjaan CBL.
+            </p>
+          </div>
 
-      <div
-        className="brand-marquee w-full overflow-hidden py-6 mb-8"
-        role="region"
-        aria-label="Daftar merek industri yang biasa ditangani"
-      >
-        <div className="brand-marquee-track">
-          {[0, 1].map((copyIndex) => (
+          <div className="lg:col-span-8 lg:col-start-5">
+            <h2 className="max-w-4xl text-[clamp(2.3rem,4.5vw,4.8rem)] font-semibold leading-[0.98] tracking-[-0.04em]">
+              Pengalaman bekerja dengan beragam spesifikasi peralatan industri.
+            </h2>
+            <p className="mt-6 max-w-2xl text-sm leading-7 text-[#657482] sm:text-base">
+              Pencantuman merek menunjukkan pengalaman penanganan komponen dan tidak menyatakan hubungan distributor atau kemitraan resmi.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-14 grid grid-cols-2 border-l border-t border-[#D9E1E8] sm:grid-cols-3 md:mt-18 lg:grid-cols-4">
+          {brandItems.map((brand) => (
             <div
-              key={copyIndex}
-              className="flex flex-nowrap shrink-0 gap-6 pr-6"
-              aria-hidden={copyIndex === 1 ? 'true' : undefined}
+              key={brand.id}
+              className="flex min-h-[9rem] flex-col items-center justify-center border-b border-r border-[#D9E1E8] px-4 py-6 text-center sm:min-h-[10rem]"
             >
-              {brandItems.map((brand) => (
-                <div
-                  key={`${copyIndex}-${brand.id}`}
-                  className="brand-marquee-card inline-flex flex-col items-center justify-between w-[240px] sm:w-[260px] h-[130px] sm:h-[140px] p-5 sm:p-6 rounded-2xl bg-white border border-[#E2E8F0] shadow-xs shrink-0 text-center select-none opacity-90 hover:opacity-100 transition-all duration-300 card-hover-lift group"
-                >
-                  <div className="w-[170px] h-[52px] flex items-center justify-center overflow-hidden">
-                    {brand.logoPath ? (
-                      <Image
-                        src={brand.logoPath}
-                        alt={copyIndex === 0 ? brand.name : ''}
-                        width={brand.logoWidth || 160}
-                        height={brand.logoHeight || 52}
-                        className="max-w-full max-h-full object-contain transition-transform duration-300 group-hover:scale-105"
-                      />
-                    ) : (
-                      <span className="font-black text-xl sm:text-2xl text-[#0F2942] tracking-tight truncate max-w-full leading-none">
-                        {brand.logoText}
-                      </span>
-                    )}
-                  </div>
-
-                  <span className="text-xs sm:text-sm text-[#475569] font-medium truncate max-w-full">
-                    {brand.category}
-                  </span>
-                </div>
-              ))}
+              <div className="flex h-14 w-full max-w-[10rem] items-center justify-center">
+                {brand.logoPath ? (
+                  <Image
+                    src={brand.logoPath}
+                    alt={brand.name}
+                    width={brand.logoWidth || 160}
+                    height={brand.logoHeight || 52}
+                    className="max-h-full max-w-full object-contain"
+                  />
+                ) : (
+                  <span className="text-lg font-semibold tracking-[-0.02em]">{brand.logoText}</span>
+                )}
+              </div>
+              <span className="mt-4 text-[0.68rem] leading-5 text-[#657482]">{brand.category}</span>
             </div>
           ))}
         </div>
-      </div>
 
-      <Container>
-        <div className="p-4 sm:p-5 rounded-xl bg-[#F0F7FD] border border-[#0E6BA8]/20 text-xs text-[#475569] leading-relaxed">
-          <p>
-            <strong className="text-[#0F2942] font-semibold">Keterangan merek dagang:</strong> {brandDisclaimer}
-          </p>
-        </div>
+        <p className="mt-6 max-w-4xl text-xs leading-6 text-[#657482]">
+          <span className="font-semibold text-[#102A43]">Keterangan merek dagang — </span>
+          {brandDisclaimer}
+        </p>
       </Container>
     </section>
   );
