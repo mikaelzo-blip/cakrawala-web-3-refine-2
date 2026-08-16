@@ -296,7 +296,8 @@ scene.render.resolution_percentage = 100
 scene.render.image_settings.file_format = 'PNG'
 scene.render.image_settings.color_mode = 'RGBA'
 scene.render.film_transparent = True
-scene.render.film_transparent_glass = True if hasattr(scene.render, 'film_transparent_glass') else False
+if hasattr(scene.render, 'film_transparent_glass'):
+    scene.render.film_transparent_glass = True
 
 try:
     scene.view_settings.look = 'AgX - Medium High Contrast'
