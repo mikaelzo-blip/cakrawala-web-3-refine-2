@@ -1,43 +1,50 @@
-import React from 'react';
 import { Container } from '@/components/ui/Container';
-import { SectionHeading } from '@/components/ui/SectionHeading';
 import { whyUsPoints } from '@/data/company';
-import { DynamicIcon } from '@/components/ui/DynamicIcon';
-import { Reveal } from '@/components/ui/Reveal';
 
 export function WhyUsSection() {
   return (
-    <section id="mengapa-cbl" className="relative py-16 md:py-28 bg-[#0F2942] text-white border-b border-[#15426B] overflow-hidden">
-      <div className="absolute inset-0 engineering-grid-dark opacity-40" aria-hidden="true" />
+    <section id="mengapa-cbl" className="border-b border-white/10 bg-[#102A43] py-20 text-white md:py-28 lg:py-32">
       <Container>
-        <Reveal className="relative">
-          <SectionHeading
-            badge="Cara Kami Memberikan Nilai"
-            title="Koordinasi teknis yang jelas untuk setiap pekerjaan."
-            description="CBL mengutamakan kejelasan kebutuhan, kesesuaian spesifikasi, koordinasi lapangan, dan dokumentasi pada setiap tahap proyek."
-            align="left"
-            light
-          />
-        </Reveal>
+        <div className="grid grid-cols-1 gap-6 border-t border-white/25 pt-5 lg:grid-cols-12 lg:gap-8">
+          <div className="lg:col-span-3">
+            <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-[#F29A67]">Working principles</p>
+            <p className="mt-3 max-w-[16rem] text-sm leading-6 text-white/60">
+              Cara CBL menjaga pekerjaan tetap jelas dari kebutuhan awal sampai dokumentasi akhir.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="lg:col-span-8 lg:col-start-5">
+            <h2 className="max-w-4xl text-[clamp(2.5rem,5vw,5.2rem)] font-semibold leading-[0.96] tracking-[-0.045em]">
+              Koordinasi teknis yang jelas lebih bernilai daripada janji yang berlebihan.
+            </h2>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-white/60 sm:text-lg sm:leading-8">
+              Kejelasan kebutuhan, kesesuaian spesifikasi, koordinasi lapangan, dan dokumentasi menjadi dasar setiap pekerjaan.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-14 md:mt-20">
           {whyUsPoints.map((point, index) => (
-            <Reveal key={point.id} delay={index * 80} className="h-full">
-            <div className="p-6 rounded-3xl bg-white/[0.06] border border-white/10 hover:border-[#67E8F9]/35 hover:bg-white/[0.09] transition-all flex flex-col justify-between h-full">
-              <div>
-                <div className="w-12 h-12 rounded-xl bg-[#0E6BA8] text-[#00A8CC] flex items-center justify-center mb-4 shadow-sm">
-                  <DynamicIcon name={point.iconName} size={24} />
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2 tracking-tight">
-                  {point.title}
-                </h3>
-                <p className="text-sm text-[#E2E8F0] leading-relaxed">
-                  {point.description}
+            <article
+              key={point.id}
+              className="grid grid-cols-1 gap-4 border-t border-white/20 py-7 md:grid-cols-12 md:gap-8 md:py-9"
+            >
+              <div className="md:col-span-1">
+                <p className="text-[0.68rem] font-semibold tracking-[0.16em] text-[#F29A67]">
+                  {String(index + 1).padStart(2, '0')}
                 </p>
               </div>
-            </div>
-            </Reveal>
+              <div className="md:col-span-4">
+                <h3 className="max-w-sm text-2xl font-semibold leading-[1.06] tracking-[-0.03em] sm:text-3xl">
+                  {point.title}
+                </h3>
+              </div>
+              <div className="md:col-span-6 md:col-start-7">
+                <p className="max-w-2xl text-sm leading-7 text-white/65 sm:text-base">{point.description}</p>
+              </div>
+            </article>
           ))}
+          <div className="border-t border-white/20" />
         </div>
       </Container>
     </section>
