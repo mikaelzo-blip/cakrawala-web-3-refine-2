@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { Container } from '@/components/ui/Container';
 import { companyInfo } from '@/data/company';
-import { IndustrialGearbox3D } from '@/components/visuals/IndustrialGearbox3D';
+import { GearmotorRenderSequence } from '@/components/visuals/GearmotorRenderSequence';
 
 const storySteps = [
   {
@@ -127,18 +127,18 @@ export function HeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative h-[820svh] w-full overflow-x-clip bg-[#F1EFE9] text-[#102A43]"
+      className="relative h-[700svh] w-full overflow-x-clip bg-[#F1EFE9] text-[#102A43]"
       aria-label="Visualisasi interaktif sistem gearmotor CBL"
     >
       <div className="sticky top-0 h-[100svh] overflow-hidden border-b border-[#102A43]/15">
         <Container className="h-full">
-          <div className="grid h-full grid-rows-[auto_1fr] py-5 sm:py-7 lg:py-8">
-            <div className="flex items-start justify-between border-t border-[#102A43]/25 pt-4">
+          <div className="grid h-full grid-rows-[auto_1fr] py-4 sm:py-5 lg:py-6">
+            <div className="flex items-start justify-between border-t border-[#102A43]/25 pt-3 sm:pt-4">
               <div>
-                <p className="text-[0.66rem] font-semibold uppercase tracking-[0.19em] text-[#8C3B16]">
+                <p className="text-[0.62rem] font-semibold uppercase tracking-[0.19em] text-[#8C3B16] sm:text-[0.66rem]">
                   CV Cakrawala Buana Lestari
                 </p>
-                <p className="mt-2 text-[0.68rem] leading-5 text-[#536474] sm:text-xs">
+                <p className="mt-1.5 text-[0.64rem] leading-5 text-[#536474] sm:mt-2 sm:text-xs">
                   Engineering · construction · technical services
                 </p>
               </div>
@@ -148,45 +148,45 @@ export function HeroSection() {
               </div>
             </div>
 
-            <div className="grid min-h-0 grid-rows-[56%_44%] lg:grid-cols-12 lg:grid-rows-1 lg:gap-8">
-              <div className="order-2 relative flex min-h-0 items-end pb-8 sm:pb-10 lg:order-1 lg:col-span-5 lg:items-center lg:pb-0">
+            <div className="grid min-h-0 grid-rows-[48%_52%] lg:grid-cols-12 lg:grid-rows-1 lg:items-center lg:gap-8">
+              <div className="order-2 relative flex min-h-0 items-end pb-8 pr-10 sm:pb-9 sm:pr-0 lg:order-1 lg:col-span-5 lg:items-center lg:pb-0">
                 <div
                   key={step.index}
                   className="w-full max-w-[43rem] transition-[opacity,transform] duration-300 ease-out"
                   style={{ opacity: edgeFade, transform: `translate3d(0, ${edgeFade < 1 ? -8 : 0}px, 0)` }}
                 >
-                  <div className="mb-4 flex items-center gap-4 text-[0.62rem] font-semibold uppercase tracking-[0.18em] text-[#8C3B16] sm:mb-5">
+                  <div className="mb-3 flex items-center gap-3 text-[0.58rem] font-semibold uppercase tracking-[0.18em] text-[#8C3B16] sm:mb-5 sm:gap-4 sm:text-[0.62rem]">
                     <span>{step.index}</span>
-                    <span className="h-px w-9 bg-[#8C3B16]/45" />
+                    <span className="h-px w-8 bg-[#8C3B16]/45 sm:w-9" />
                     <span>{step.label}</span>
                   </div>
 
-                  <h1 className="max-w-[42rem] text-[clamp(2.15rem,8vw,4.2rem)] font-semibold leading-[0.94] tracking-[-0.048em] text-[#102A43] lg:text-[clamp(3rem,4.6vw,5.4rem)]">
+                  <h1 className="max-w-[42rem] text-[clamp(2rem,8vw,4.2rem)] font-semibold leading-[0.94] tracking-[-0.048em] text-[#102A43] lg:text-[clamp(3rem,4.6vw,5.4rem)]">
                     {step.title}
                   </h1>
 
-                  <p className="mt-4 max-w-xl text-sm leading-6 text-[#536474] sm:mt-5 sm:text-base sm:leading-7">
+                  <p className="mt-3 max-w-xl text-[0.82rem] leading-5 text-[#536474] sm:mt-5 sm:text-base sm:leading-7">
                     {step.body}
                   </p>
 
-                  <p className="mt-5 border-t border-[#102A43]/18 pt-3 text-[0.58rem] font-semibold uppercase tracking-[0.17em] text-[#6A767F] sm:text-[0.64rem]">
+                  <p className="mt-4 border-t border-[#102A43]/18 pt-2.5 text-[0.54rem] font-semibold uppercase tracking-[0.16em] text-[#6A767F] sm:mt-5 sm:pt-3 sm:text-[0.64rem]">
                     {step.technical}
                   </p>
 
                   {'final' in step && step.final && (
-                    <div className="mt-6 flex flex-wrap items-center gap-x-7 gap-y-4">
+                    <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3 sm:mt-6 sm:gap-x-7 sm:gap-y-4">
                       <a
                         href={whatsappHref}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group inline-flex items-center gap-3 border-b border-[#8C3B16] pb-1 text-sm font-semibold text-[#8C3B16] transition-colors hover:text-[#6F2E12]"
+                        className="group inline-flex items-center gap-2 border-b border-[#8C3B16] pb-1 text-[0.78rem] font-semibold text-[#8C3B16] transition-colors hover:text-[#6F2E12] sm:gap-3 sm:text-sm"
                       >
                         Diskusikan kebutuhan teknis
                         <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">↗</span>
                       </a>
                       <Link
                         href="/proyek"
-                        className="group inline-flex items-center gap-3 border-b border-[#102A43]/40 pb-1 text-sm font-semibold text-[#102A43] transition-colors hover:border-[#102A43]"
+                        className="group inline-flex items-center gap-2 border-b border-[#102A43]/40 pb-1 text-[0.78rem] font-semibold text-[#102A43] transition-colors hover:border-[#102A43] sm:gap-3 sm:text-sm"
                       >
                         Lihat pekerjaan kami
                         <span aria-hidden="true" className="transition-transform duration-200 group-hover:translate-x-1">→</span>
@@ -197,16 +197,16 @@ export function HeroSection() {
               </div>
 
               <div className="order-1 relative min-h-0 lg:order-2 lg:col-span-7">
-                <div className="absolute inset-[-3%_-8%_0_-8%] lg:inset-[-5%_-10%_-4%_-12%]">
-                  <IndustrialGearbox3D progress={progress} activeStep={currentStep} />
+                <div className="absolute inset-[-8%_-18%_-7%_-18%] sm:inset-[-9%_-15%_-8%_-15%] lg:inset-[-11%_-12%_-10%_-16%]">
+                  <GearmotorRenderSequence progress={progress} activeStep={currentStep} />
                 </div>
               </div>
             </div>
           </div>
         </Container>
 
-        <div className="pointer-events-none absolute bottom-4 right-4 z-30 flex items-end gap-3 sm:right-6 lg:bottom-7 lg:right-8">
-          <div className="hidden text-right text-[0.58rem] font-semibold uppercase tracking-[0.15em] text-[#6A767F] md:block">
+        <div className="pointer-events-none absolute bottom-7 right-8 z-30 hidden items-end gap-3 md:flex">
+          <div className="text-right text-[0.58rem] font-semibold uppercase tracking-[0.15em] text-[#6A767F]">
             <p>{step.label}</p>
             <p className="mt-1 text-[#102A43]">{Math.round(progress * 100)}%</p>
           </div>
