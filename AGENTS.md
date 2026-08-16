@@ -17,6 +17,18 @@ This file contains critical documentation, architectural patterns, and guideline
 
 ---
 
+## 🎨 Human-Led Design Direction
+
+Before changing visual layout, homepage sections, typography, animation, component styling, or responsive composition, read and follow `DESIGN_DIRECTION.md`.
+
+The website must not look like a generic AI-generated SaaS template. Work section-by-section and use the actual CBL brand, project photography, and business content as the source of visual identity. Prefer editorial, industrial, and architectural composition over decorative UI patterns.
+
+Do not add pills, floating cards, gradient blobs, glassmorphism, excessive rounded containers, repetitive icon cards, generic marketing statistics, or decorative motion unless the specific content genuinely requires them.
+
+For visual redesign work, prioritize typography, spacing, image composition, asymmetry, project storytelling, restrained motion, and deliberately designed mobile layouts.
+
+---
+
 ## 📞 Official Corporate Contact Details
 
 Centralized in `src/data/company.ts`:
